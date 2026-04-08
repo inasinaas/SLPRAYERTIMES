@@ -1731,25 +1731,15 @@ function init() {
     const today = new Date();
     const currentMonthIndex = today.getMonth(); // 0-11
 
-    // Default to February (1) if not in Feb or Mar (2)
-    let targetMonth = 1;
-    if (currentMonthIndex === 1 || currentMonthIndex === 2) {
-        targetMonth = currentMonthIndex;
-    }
-
     // Set Month
-    monthSelect.value = targetMonth;
+    monthSelect.value = currentMonthIndex;
     onMonthChange(); // Trigger date population
 
     // Set Date
-    if (currentMonthIndex === targetMonth) {
-        dateSelect.value = today.getDate();
-    } else {
-        dateSelect.value = 1; // Default to 1st if not current month
-    }
+    dateSelect.value = today.getDate();
     onDateChange(); // Enable district
 
-    // Set District (Fixed to Zone 01)
+    // Set District (Default to Colombo - Zone 01)
     districtSelect.value = "zone01";
     onDistrictChange(); // Show data
 }
