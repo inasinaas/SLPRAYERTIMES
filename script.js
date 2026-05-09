@@ -470,70 +470,59 @@ function updatePrayerCard(name, time) {
 
 
 function getHijriHTML(date) {
-    // Anchor: Feb 19, 2026
-    // SL: Feb 19 = Ramadan 1
-    // Makkah: Feb 19 = Ramadan 2
+    // Anchor: May 9, 2026
+    // SL: May 9 = 21 Dhu al-Qi'dah 1447 AH
+    // Makkah: May 9 = 22 Dhu al-Qi'dah 1447 AH
 
-    // Create anchor date (Feb 19, 2026) at midnight
-    const anchor = new Date(2026, 1, 19); // Month is 0-indexed (1 = Feb)
+    // Create anchor date (May 9, 2026) at midnight
+    const anchor = new Date(2026, 4, 9); // Month is 0-indexed (4 = May)
     anchor.setHours(0, 0, 0, 0);
 
     // Clone input date to avoid mutation and set to midnight
     const target = new Date(date);
     target.setHours(0, 0, 0, 0);
 
-    // Manual Hijri Date configuration for March 21, 2026 onwards (After March 20)
-    const manualStart = new Date(2026, 2, 21); // Month is 0-indexed (2 = March)
-    manualStart.setHours(0, 0, 0, 0);
+    // Check for manual overrides
+    const manualSL = localStorage.getItem('manualSLHijri');
+    const manualMakkah = localStorage.getItem('manualMakkahHijri');
 
-    if (target >= manualStart) {
-        const manualSL = localStorage.getItem('manualSLHijri');
-        const manualMakkah = localStorage.getItem('manualMakkahHijri');
-        
-        // If they enter nothing, just leave it blank/space
-        const slDisplay = manualSL ? manualSL : '&nbsp;';
-        const makkahDisplay = manualMakkah ? manualMakkah : '&nbsp;';
-
-        return `
-            <div class="hijri-row">
-                <span class="hijri-icon">🇱🇰</span>
-                <span class="hijri-text">${slDisplay}</span>
-            </div>
-            <div class="hijri-row">
-                <span class="hijri-icon">🕋</span>
-                <span class="hijri-text">${makkahDisplay}</span>
-            </div>
-        `;
-    }
-
-    // valid calculation?
+    // Calculate dynamic dates
     const diffTime = target - anchor;
     const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
-    const slDay = 1 + diffDays;
-    const makkahDay = 2 + diffDays;
+    const slDay = 21 + diffDays;
+    const makkahDay = 22 + diffDays;
+
+    const slText = manualSL ? manualSL : formatHijriText(slDay);
+    const makkahText = manualMakkah ? manualMakkah : formatHijriText(makkahDay);
 
     return `
-        <div class="hijri-row">
+        <div class="hijri-row hijri-row-sl">
             <span class="hijri-icon">🇱🇰</span>
-            <span class="hijri-text">${formatHijriText(slDay)}</span>
+            <div class="hijri-text">
+                <span class="hijri-label">Sri Lanka ACJU</span>
+                <span class="hijri-value">${slText}</span>
+            </div>
         </div>
-        <div class="hijri-row">
+        <div class="hijri-row hijri-row-makkah">
             <span class="hijri-icon">🕋</span>
-            <span class="hijri-text">${formatHijriText(makkahDay)}</span>
+            <div class="hijri-text">
+                <span class="hijri-label">Mecca</span>
+                <span class="hijri-value">${makkahText}</span>
+            </div>
         </div>
     `;
 }
 
 function formatHijriText(day) {
     if (day > 0 && day <= 30) {
-        return `Ramadan ${day}`;
+        return `${day} Dhu al-Qi'dah 1447 AH`;
     } else if (day <= 0) {
-        // Simple fallback for pre-Ramadan
-        return `Shaban ${30 + day}`;
+        // Simple fallback for pre-month
+        return `${30 + day} Shawwal 1447 AH`;
     } else {
-        // Post Ramadan
-        return `Shawwal ${day - 30}`;
+        // Post month
+        return `${day - 30} Dhu al-Hijjah 1447 AH`;
     }
 }
 

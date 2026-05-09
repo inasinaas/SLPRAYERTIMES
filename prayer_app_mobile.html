@@ -397,15 +397,11 @@
         .hijri-date-container {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            margin-bottom: 12px;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            background: rgba(255, 255, 255, 0.05);
-            padding: 8px 12px;
-            border-radius: 8px;
-            width: fit-content;
+            align-items: stretch;
+            gap: 8px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 320px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -413,16 +409,88 @@
         .hijri-row {
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: default;
+        }
+
+        .hijri-row:hover {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        /* Sri Lanka Style */
+        .hijri-row-sl {
+            border-left: 4px solid #facc15; /* Yellow */
+            background: linear-gradient(90deg, rgba(250, 204, 21, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+        }
+
+        .hijri-row-sl:hover {
+            box-shadow: 0 8px 20px rgba(250, 204, 21, 0.15);
+            border-color: rgba(250, 204, 21, 0.2);
+        }
+
+        /* Mecca Style */
+        .hijri-row-makkah {
+            border-left: 4px solid #10b981; /* Emerald */
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+        }
+
+        .hijri-row-makkah:hover {
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.2);
         }
 
         .hijri-icon {
-            font-size: 1.1em;
+            font-size: 1.8rem;
+            line-height: 1;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        .hijri-row-makkah .hijri-icon {
+            animation-delay: 1.5s;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
         }
 
         .hijri-text {
-            font-weight: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .hijri-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .hijri-row-sl .hijri-label {
+            color: #fde047;
+        }
+
+        .hijri-row-makkah .hijri-label {
+            color: #6ee7b7;
+        }
+
+        .hijri-value {
+            font-weight: 600;
             color: var(--text-primary);
+            font-size: 1.05rem;
+            letter-spacing: 0.3px;
         }
 
         /* Azan Alert Overlay */
@@ -572,12 +640,12 @@
             </div>
 
             <div class="form-group" style="margin-top: 15px;">
-                <label class="form-label" for="manual-sl-hijri">SL Hijri Date (Manual after Mar 20)</label>
-                <input type="text" id="manual-sl-hijri" style="background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); padding: 0.75rem; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="e.g. Shawwal 1">
+                <label class="form-label" for="manual-sl-hijri">SL Hijri Date (Manual Override)</label>
+                <input type="text" id="manual-sl-hijri" style="background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); padding: 0.75rem; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="e.g. 21 Dhu al-Qi'dah 1447 AH">
             </div>
             <div class="form-group" style="margin-top: 15px; margin-bottom: 20px;">
-                <label class="form-label" for="manual-makkah-hijri">Makkah Hijri Date (Manual after Mar 20)</label>
-                <input type="text" id="manual-makkah-hijri" style="background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); padding: 0.75rem; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="e.g. Shawwal 2">
+                <label class="form-label" for="manual-makkah-hijri">Makkah Hijri Date (Manual Override)</label>
+                <input type="text" id="manual-makkah-hijri" style="background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); padding: 0.75rem; border-radius: 8px; width: 100%; box-sizing: border-box;" placeholder="e.g. 22 Dhu al-Qi'dah 1447 AH">
             </div>
 
             <button class="btn-primary" id="save-settings">Save Changes</button>
@@ -1999,70 +2067,53 @@ function updatePrayerCard(name, time) {
 
 
 function getHijriHTML(date) {
-    // Anchor: Feb 19, 2026
-    // SL: Feb 19 = Ramadan 1
-    // Makkah: Feb 19 = Ramadan 2
+    // Anchor: May 9, 2026
+    // SL: May 9 = 21 Dhu al-Qi'dah 1447 AH
+    // Makkah: May 9 = 22 Dhu al-Qi'dah 1447 AH
 
-    // Create anchor date (Feb 19, 2026) at midnight
-    const anchor = new Date(2026, 1, 19); // Month is 0-indexed (1 = Feb)
+    // Create anchor date (May 9, 2026) at midnight
+    const anchor = new Date(2026, 4, 9); // Month is 0-indexed (4 = May)
     anchor.setHours(0, 0, 0, 0);
 
     // Clone input date to avoid mutation and set to midnight
     const target = new Date(date);
     target.setHours(0, 0, 0, 0);
 
-    // Manual Hijri Date configuration for March 21, 2026 onwards (After March 20)
-    const manualStart = new Date(2026, 2, 21); // Month is 0-indexed (2 = March)
-    manualStart.setHours(0, 0, 0, 0);
+    // Check for manual overrides
+    const manualSL = localStorage.getItem('manualSLHijri');
+    const manualMakkah = localStorage.getItem('manualMakkahHijri');
 
-    if (target >= manualStart) {
-        const manualSL = localStorage.getItem('manualSLHijri');
-        const manualMakkah = localStorage.getItem('manualMakkahHijri');
-        
-        // If they enter nothing, just leave it blank/space
-        const slDisplay = manualSL ? manualSL : '&nbsp;';
-        const makkahDisplay = manualMakkah ? manualMakkah : '&nbsp;';
-
-        return `
-            <div class="hijri-row">
-                <span class="hijri-icon">🇱🇰</span>
-                <span class="hijri-text">${slDisplay}</span>
-            </div>
-            <div class="hijri-row">
-                <span class="hijri-icon">🕋</span>
-                <span class="hijri-text">${makkahDisplay}</span>
-            </div>
-        `;
-    }
-
-    // valid calculation?
+    // Calculate dynamic dates
     const diffTime = target - anchor;
     const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
-    const slDay = 1 + diffDays;
-    const makkahDay = 2 + diffDays;
+    const slDay = 21 + diffDays;
+    const makkahDay = 22 + diffDays;
+
+    const slText = manualSL ? manualSL : formatHijriText(slDay);
+    const makkahText = manualMakkah ? manualMakkah : formatHijriText(makkahDay);
 
     return `
         <div class="hijri-row">
             <span class="hijri-icon">🇱🇰</span>
-            <span class="hijri-text">${formatHijriText(slDay)}</span>
+            <span class="hijri-text">Sri Lanka ACJU: ${slText}</span>
         </div>
         <div class="hijri-row">
             <span class="hijri-icon">🕋</span>
-            <span class="hijri-text">${formatHijriText(makkahDay)}</span>
+            <span class="hijri-text">Mecca: ${makkahText}</span>
         </div>
     `;
 }
 
 function formatHijriText(day) {
     if (day > 0 && day <= 30) {
-        return `Ramadan ${day}`;
+        return `${day} Dhu al-Qi'dah 1447 AH`;
     } else if (day <= 0) {
-        // Simple fallback for pre-Ramadan
-        return `Shaban ${30 + day}`;
+        // Simple fallback for pre-month
+        return `${30 + day} Shawwal 1447 AH`;
     } else {
-        // Post Ramadan
-        return `Shawwal ${day - 30}`;
+        // Post month
+        return `${day - 30} Dhu al-Hijjah 1447 AH`;
     }
 }
 

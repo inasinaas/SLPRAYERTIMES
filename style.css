@@ -384,15 +384,11 @@ body::before {
 .hijri-date-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 12px;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.05);
-  padding: 8px 12px;
-  border-radius: 8px;
-  width: fit-content;
+  align-items: stretch;
+  gap: 8px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 320px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -400,14 +396,86 @@ body::before {
 .hijri-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: default;
+}
+
+.hijri-row:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* Sri Lanka Style */
+.hijri-row-sl {
+  border-left: 4px solid #facc15; /* Yellow */
+  background: linear-gradient(90deg, rgba(250, 204, 21, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+}
+
+.hijri-row-sl:hover {
+  box-shadow: 0 8px 20px rgba(250, 204, 21, 0.15);
+  border-color: rgba(250, 204, 21, 0.2);
+}
+
+/* Mecca Style */
+.hijri-row-makkah {
+  border-left: 4px solid #10b981; /* Emerald */
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+}
+
+.hijri-row-makkah:hover {
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.2);
 }
 
 .hijri-icon {
-  font-size: 1.1em;
+  font-size: 1.8rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  animation: floatIcon 3s ease-in-out infinite;
+}
+
+.hijri-row-makkah .hijri-icon {
+  animation-delay: 1.5s;
+}
+
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
 }
 
 .hijri-text {
-  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.hijri-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.hijri-row-sl .hijri-label {
+  color: #fde047;
+}
+
+.hijri-row-makkah .hijri-label {
+  color: #6ee7b7;
+}
+
+.hijri-value {
+  font-weight: 600;
   color: var(--text-primary);
+  font-size: 1.05rem;
+  letter-spacing: 0.3px;
 }
